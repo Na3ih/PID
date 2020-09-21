@@ -12,7 +12,9 @@
 #include <PID_Algorithm.h>
 
 void identyficationSystemConfig(void);
+void motorSpeedLog(void);
 volatile unsigned int timer_ms = 0;
+volatile unsigned int i =0;
 
 int main(void)
 {
@@ -25,12 +27,22 @@ int main(void)
 
 void SysTick_Handler(void)
 {
-    
     if (timer_ms >= SAMPLING_TIME_MS) {
         timer_ms = 0;
         float speed = 0.0;         
         speed = convertToRPM(encoderGetImpulsesNumber(), ENCODER_RESOLUTION, SAMPLING_TIME_MS);
+         float u = calculatePID(2000, speed);
+        setPWM((uint16_t)(u / 5.4));
+
+        if ((i++) >= 100) {
+        i = 0;
+        usart5SendString("PWM:", 4);
+        usart5Send((uint16_t)(u / 5.4));
+        usart5SendString("SPEED:", 6);
         usart5Send(speed);
+        }
+// usart5Send(TIM3->CNT);
+// TIM3->CNT = 0;
     } else {
         timer_ms++;
     }
@@ -47,4 +59,10 @@ void identyficationSystemConfig(void)
     usart5SendString("SysTick_Config\n\r", 16);
 }
 
+// void motorSpeedLog(void)
+// {
+//     float speed = 0.0;         
+//     speed = convertToRPM(encoderGetImpulsesNumber(), ENCODER_RESOLUTION, SAMPLING_TIME_MS);
+//     usart5Send(speed);
+// }
 
