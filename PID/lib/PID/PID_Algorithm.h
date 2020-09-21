@@ -3,5 +3,10 @@
 
 // #include "PID_Tune.h"
 
-float calculatePID(float setpoint,float actual_value);
+void calculatePID(float setpoint,float actual_value, float * retTab);
+
+enum direction {
+    LEFT = 1,
+    RIGHT = 0
+};
 #endif
