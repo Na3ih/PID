@@ -1,7 +1,6 @@
 /**
- * @brief Program implements control algorithm for rotation angle adjustment of a DC motor with an encoder. 
- *        Rotation angle control use simple PID regulator algorithm.
- * @warning In project used incremental encoder so number of encoder ticks are added or subtracted depends on direction.
+ * @brief Program implements the identification test algorithm for a DC motor with an encoder. 
+ *        It consists in measuring the rotational speed and logging the results by UART.
  *        
  *        The algorithm was adapted to the STM32F4 DISCO evaluation board connected to the L298N DC motor controller.
  */ 
@@ -28,6 +27,7 @@ uint8_t actualDirection = LEFT;
 int main(void)
 {
     identyficationSystemConfig();
+    //setPWM(1000);
     usart5SendString("START\n\r", 7);
     motorDirectionLeft();
     while(1);
@@ -36,6 +36,10 @@ int main(void)
 
 void SysTick_Handler(void)
 {
+   /* if (timer_ms >= SAMPLING_TIME_MS) {
+        timer_ms = 0;
+        usart5Send(TIM3->CNT);  */
+ 
     static int position = 0;
     static uint32_t ms = 0;
     static float step = 1.0;
@@ -48,7 +52,7 @@ void SysTick_Handler(void)
         }
         TIM3->CNT = 0;
         
-        calculatePID(20.0, position, stering);
+        calculatePID(-1.0, position, stering);
         leftDirFlag = stering[1];
 
         if (leftDirFlag != actualDirection) {
@@ -87,6 +91,8 @@ void controlGpioConfig( void )
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
     GPIOC->MODER |= GPIO_MODER_MODER0_0 | GPIO_MODER_MODER2_0;
     GPIOC->ODR &= ~(GPIO_ODR_ODR_0 | GPIO_ODR_ODR_2);
+// GPIOC->ODR |= (GPIO_ODR_ODR_0);
+// GPIOC->ODR &= ~(GPIO_ODR_ODR_2);
 }
 
 void motorStop(void) 
