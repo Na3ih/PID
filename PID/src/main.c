@@ -31,7 +31,7 @@ void SysTick_Handler(void)
         timer_ms = 0;
         float speed = 0.0;         
         speed = convertToRPM(encoderGetImpulsesNumber(), ENCODER_RESOLUTION, SAMPLING_TIME_MS);
-         float u = calculatePID(2000, speed);
+         float u = calculatePID(3000, speed);
         setPWM((uint16_t)(u / 5.4));
 
         if ((i++) >= 100) {
